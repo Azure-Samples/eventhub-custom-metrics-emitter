@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {          
+      "EventHubNamespace": {
+        "value": "<Event exisitng Hub Namespace>"
+      },
+      "EventHubName":{
+        "value": "<your existing EventHub Name>"
+      },
+      "CheckpointAccountName":{
+        "value": "<your Checkpoint Account Name>"
+      },
+      "CheckpointContainerName":{
+        "value": "<your Checkpoint Container Name>"
+      },
+      "CustomMetricInterval":{
+        "value": "10000"
+      },
+      "managedIdentityName":{
+        "value": "<existing managed identity name>"      
+      },
+      "AcaEnvName":{
+        "value": "< your existing ACA env name>"
+      },
+      "EmitterImage":{
+        "value": "yodobrin/custom-metrics-emitter:0.4"
+      },
+      "ContainerAppName":{
+        "value": "<your existing container app name>"
+      }
+    }
+  }
