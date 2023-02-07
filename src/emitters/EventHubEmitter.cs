@@ -1,13 +1,13 @@
-﻿namespace custom_metrics_emitter;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 
-using Azure.Core;
+namespace eventhub_custom_metrics_emitter;
+
 using Azure.Identity;
+using Azure.Messaging.EventHubs.Consumer;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using custom_metrics_emitter.emitters;
-using Azure.Messaging.EventHubs;
-using Azure.Messaging.EventHubs.Consumer;
-using System.Collections.Concurrent;
+using emitters;
 
 internal record LagInformation(string ConsumerName, string PartitionId, long Lag);
 
@@ -32,28 +32,28 @@ public class EventHubEmitter
     private readonly EmitterHelper _emitter;
     private readonly BlobContainerClient _checkpointContainerClient = default!;
     private readonly Dictionary<string, ConsumerClientInfo> _eventhubConsumerClientsInfo = new();
-    private readonly string[] _consumerGroups = default!;    
+    private readonly string[] _consumerGroups = default!;
 
     public EventHubEmitter(ILogger<Worker> logger, EmitterConfig config, DefaultAzureCredential defaultCredential)
     {
-        
+
         (_logger, _cfg) = (logger, config);
 
         _emitter = new EmitterHelper(_logger, defaultCredential);
 
         if (string.IsNullOrEmpty(config.ConsumerGroup))
-        { 
+        {
             _consumerGroups = _emitter.GetAllConsumerGroup(_cfg.EventHubNamespace, _cfg.EventHubName);
         }
         else
         {
-            _consumerGroups = config.ConsumerGroup.Split(';');             
+            _consumerGroups = config.ConsumerGroup.Split(';');
         }
 
         _eventhubresourceId = $"/subscriptions/{_cfg.SubscriptionId}/resourceGroups/{_cfg.ResourceGroup}/providers/Microsoft.EventHub/namespaces/{_cfg.EventHubNamespace}";
         _prefix = $"{_cfg.EventHubNamespace.ToLowerInvariant()}{SERVICE_BUS_HOST_SUFFIX}/{_cfg.EventHubName.ToLowerInvariant()}";
 
-        
+
         _checkpointContainerClient = new BlobContainerClient(
             blobContainerUri: new($"https://{_cfg.CheckpointAccountName}{STORAGE_HOST_SUFFIX}/{_cfg.CheckpointContainerName}"),
             credential: defaultCredential);
@@ -70,9 +70,9 @@ public class EventHubEmitter
             var partitions = client.GetPartitionIdsAsync().Result;
 
             _eventhubConsumerClientsInfo.TryAdd(cGroup,
-                new(consumerClient: client, partitionIds: partitions));                           
-        }   
-    }    
+                new(consumerClient: client, partitionIds: partitions));
+        }
+    }
 
     public async Task<HttpResponseMessage> ReadFromBlobStorageAndPublishToAzureMonitorAsync(CancellationToken cancellationToken = default)
     {
@@ -106,7 +106,7 @@ public class EventHubEmitter
                     from id in _eventhubConsumerClientsInfo[consumer]._partitionIds
                     select new { consumerGroup = consumer, partitionId = id, Task = LagInPartition(consumer, id, cancellationToken) };
 
-        await Task.WhenAll(tasks.Select(s => s.Task));        
+        await Task.WhenAll(tasks.Select(s => s.Task));
 
         return tasks
             .Select(x => new LagInformation(x.consumerGroup, x.partitionId, x.Task.Result))
@@ -121,7 +121,7 @@ public class EventHubEmitter
         {
             var partitionInfo = await _eventhubConsumerClientsInfo[consumerGroup]._consumerClient.GetPartitionPropertiesAsync(
                 partitionId,
-                cancellationToken);           
+                cancellationToken);
             // if partitionInfo.LastEnqueuedOffset = -1, that means event hub partition is empty
             if ((partitionInfo != null) && (partitionInfo.LastEnqueuedOffset == -1))
             {

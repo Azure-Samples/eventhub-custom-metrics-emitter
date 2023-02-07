@@ -1,4 +1,7 @@
-﻿namespace custom_metrics_emitter;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
+namespace eventhub_custom_metrics_emitter;
 
 using Azure.Identity;
 

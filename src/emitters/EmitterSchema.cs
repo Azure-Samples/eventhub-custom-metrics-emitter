@@ -1,4 +1,7 @@
-﻿namespace custom_metrics_emitter.emitters;
+﻿// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
+namespace eventhub_custom_metrics_emitter.emitters;
 
 using System.Text.Json.Serialization;
 
