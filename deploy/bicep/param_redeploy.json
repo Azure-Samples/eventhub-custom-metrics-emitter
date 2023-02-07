@@ -24,7 +24,7 @@
         "value": "< your existing ACA env name>"
       },
       "EmitterImage":{
-        "value": "yodobrin/custom-metrics-emitter:0.4"
+        "value": "azure-samples/eventhub-custom-metrics-emitter:latest"
       },
       "ContainerAppName":{
         "value": "<your existing container app name>"
