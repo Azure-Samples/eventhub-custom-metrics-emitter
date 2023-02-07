@@ -1,12 +1,12 @@
-namespace custom_metrics_emitter.emitters;
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
+namespace eventhub_custom_metrics_emitter.emitters;
 
 using Azure.Core;
 using Azure.Identity;
-using Microsoft.Azure.Amqp.Framing;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
@@ -15,11 +15,11 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Xml.Linq;
 
-public record struct AccessTokenAndExpiration(bool isExpired, string token);
+public record struct AccessTokenAndExpiration(bool IsExpired, string Token);
 
 public class EmitterHelper
 {
-    private static readonly HttpClient _httpClient = new();    
+    private static readonly HttpClient _httpClient = new();
     private readonly ILogger<Worker> _logger;
     private readonly TokenStore _TokenStore;
 
@@ -28,7 +28,7 @@ public class EmitterHelper
         _logger = logger;
         _TokenStore = new TokenStore(
             defaultAzureCredential);
-    }  
+    }
 
     public async Task<HttpResponseMessage> SendCustomMetric(
         string? region, string? resourceId, EmitterSchema metricToSend,
@@ -37,7 +37,7 @@ public class EmitterHelper
         if ((region != null) && (resourceId != null))
         {
             var record = await _TokenStore.RefreshAzureMonitorCredentialOnDemandAsync(cancellationToken);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", record.token);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", record.Token);
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             string uri = $"https://{region}.monitoring.azure.com{resourceId}/metrics";
@@ -59,12 +59,12 @@ public class EmitterHelper
     public string[] GetAllConsumerGroup(string eventhubNamespace, string eventhub)
     {
         var ehRecord = _TokenStore.RefreshAzureEventHubCredentialOnDemand();
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ehRecord.token);
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ehRecord.Token);
 
         string uri = $"https://{eventhubNamespace}.servicebus.windows.net/{eventhub}/consumergroups?timeout=60&api-version=2014-01";
 
         _logger.LogInformation("GetAllConsumerGroup:{uri}", uri);
-        var response = _httpClient.GetAsync(uri).Result.Content.ReadAsStringAsync().Result;        
+        var response = _httpClient.GetAsync(uri).Result.Content.ReadAsStringAsync().Result;
         var doc = XDocument.Parse(response);
         var entries = from item in doc.Root!.
                       Descendants().
@@ -116,8 +116,7 @@ public class EmitterHelper
         private static readonly string EVENTHUBS_SCOPE = "https://eventhubs.azure.net/.default";
 
         private readonly DefaultAzureCredential _defaultAzureCredential;
-        private ConcurrentDictionary<string, AccessToken?> _scopeAndTokens = new();
-
+        private readonly ConcurrentDictionary<string, AccessToken?> _scopeAndTokens = new();
 
         public TokenStore(DefaultAzureCredential defaultAzureCredential)
         {
@@ -127,31 +126,22 @@ public class EmitterHelper
         }
 
         public ValueTask<AccessTokenAndExpiration> RefreshAzureMonitorCredentialOnDemandAsync(CancellationToken cancellationToken = default)
-        {
-            return RefreshCredentialOnDemand(MONITOR_SCOPE, cancellationToken);
-        }
+            => RefreshCredentialOnDemand(MONITOR_SCOPE, cancellationToken);
 
         public ValueTask<AccessTokenAndExpiration> RefreshAzureEventHubCredentialOnDemandAsync(CancellationToken cancellationToken = default)
-        {
-            return RefreshCredentialOnDemand(EVENTHUBS_SCOPE, cancellationToken);
-        }
+            => RefreshCredentialOnDemand(EVENTHUBS_SCOPE, cancellationToken);
 
         public AccessTokenAndExpiration RefreshAzureMonitorCredentialOnDemand(CancellationToken cancellationToken = default)
-        {
-            return RefreshCredentialOnDemand(MONITOR_SCOPE, cancellationToken).Result;
-        }
+            => RefreshCredentialOnDemand(MONITOR_SCOPE, cancellationToken).Result;
 
         public AccessTokenAndExpiration RefreshAzureEventHubCredentialOnDemand(CancellationToken cancellationToken = default)
-        {
-            return RefreshCredentialOnDemand(EVENTHUBS_SCOPE, cancellationToken).Result;
-        }
+            => RefreshCredentialOnDemand(EVENTHUBS_SCOPE, cancellationToken).Result;
 
         public async ValueTask<AccessTokenAndExpiration> RefreshCredentialOnDemand(string scope, CancellationToken cancellationToken = default)
         {
             bool needsNewToken(TimeSpan safetyInterval)
             {
-                AccessToken? token;
-                if (_scopeAndTokens.TryGetValue(scope, out token))
+                if (_scopeAndTokens.TryGetValue(scope, out AccessToken? token))
                 {
                     if (!token.HasValue) return true;
                     var timeUntilExpiry = token!.Value.ExpiresOn.Subtract(DateTimeOffset.UtcNow);
@@ -168,8 +158,7 @@ public class EmitterHelper
                         requestContext: new TokenRequestContext(new[] { scope }),
                         cancellationToken: cancellationToken);
 
-                AccessToken? token;
-                if (_scopeAndTokens.TryGetValue(scope, out token) == false)
+                if (_scopeAndTokens.TryGetValue(scope, out _) == false)
                 {
                     _scopeAndTokens.TryAdd(scope, newToken);
                 }

@@ -1,4 +1,7 @@
-using custom_metrics_emitter;
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
+using eventhub_custom_metrics_emitter;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
@@ -19,4 +22,3 @@ IHost host = Host.CreateDefaultBuilder(args)
     .Build();
 
 await host.RunAsync();
-
