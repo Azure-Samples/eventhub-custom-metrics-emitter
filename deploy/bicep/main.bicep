@@ -60,7 +60,7 @@ module ACA 'aca.bicep' = {
     EventHubName: EventHubName
     CheckpointContainerName: CheckpointContainerName
     CustomMetricInterval: CustomMetricInterval
-    EmitterImage: 'yodobrin/custom-metrics-emitter:0.3'
+    EmitterImage: 'azure-samples/eventhub-custom-metrics-emitter:latest'
     registryLoginServer: 'ghcr.io'
   }
 }
