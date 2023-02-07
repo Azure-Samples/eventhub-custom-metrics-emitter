@@ -1,4 +1,4 @@
-﻿namespace custom_metrics_emitter;
+namespace custom_metrics_emitter;
 
 public record EmitterConfig(
     string Region,

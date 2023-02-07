@@ -1,4 +1,4 @@
-﻿namespace custom_metrics_emitter.emitters;
+namespace custom_metrics_emitter.emitters;
 
 using Azure.Core;
 using Azure.Identity;

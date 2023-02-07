@@ -1,4 +1,4 @@
-﻿using custom_metrics_emitter;
+using custom_metrics_emitter;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
