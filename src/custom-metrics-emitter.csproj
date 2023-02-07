@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-custom_metrics_emitter-3dc3a13e-0171-4a69-85b3-c2b100c2669a</UserSecretsId>
+    <RootNamespace>custom_metrics_emitter</RootNamespace>
+    <DockerComposeProjectPath>../docker-compose.dcproj</DockerComposeProjectPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.21.0" />
+    <PackageReference Include="Azure.Identity" Version="1.8.1" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.14.1" />
+    <PackageReference Include="Azure.Messaging.EventHubs" Version="5.7.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Microsoft.ApplicationInsights.WorkerService" />
+    <None Remove="emitters\" />
+    <None Remove="Azure.Identity" />
+    <None Remove="Azure.Messaging.EventHubs" />
+    <None Remove="Azure.Messaging.ServiceBus" />
+    <None Remove="Azure.Storage.Blobs" />
+    <None Remove="Microsoft.Azure.EventHubs" />
+  </ItemGroup>
+</Project>
