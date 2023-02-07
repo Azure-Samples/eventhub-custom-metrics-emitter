@@ -1,8 +1,5 @@
 
 
-// @description('managed identity name from param.json file')
-// param managedIdentityName string 
-
 @description('container app environment name from param.json file')
 param AcaEnvName string
 
@@ -18,12 +15,6 @@ param registryLoginServer string = 'ghcr.io'
 
 @description('managed identity name from param.json file')
 param managedIdentityName string 
-
-// @description('Managed Identity Client Id - created in main.bicep')
-// param ManagedIdentityClientId string
-
-
-
 
 param location string = resourceGroup().location
 
@@ -52,15 +43,6 @@ param CustomMetricInterval string
 resource mngIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' existing = {
   name: managedIdentityName 
 }
-
-// @description('Managed Identity Client Id - created in main.bicep')
-// param ManagedIdentityId string = mngIdentity.id
-
-// // in case using an existing log analytics workspace - this is the code to use
-// resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' existing = {
-//   name: 'emitter-log-analytics'
-//   scope: resourceGroup() 
-// }
 
 // and this is the code to use for the existing container app environment
 
