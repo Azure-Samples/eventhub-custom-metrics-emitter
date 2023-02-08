@@ -7,6 +7,9 @@ languages:
 products:
 - azure-event-hubs
 - azure-monitor
+name: Expose how much a certain Event Hubs consumer group is 'behind' as a custom Azure Monitor metric.
+description: ".NET app that reads EventHub checkpoint information from storage, computes how much 'behind' a certain consumer group is, and emits the lag as a custom metric to Azure Monitor."
+
 ---
 
 # eventhub-custom-metrics-emitter
